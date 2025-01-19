@@ -1,0 +1,39 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+# 1. Load the dataset from GitHub URL
+data_url = "https://raw.githubusercontent.com/kdemertzis/EKPA/main/Data/pcap_data.csv"
+data = pd.read_csv(data_url)
+
+# 2. Data Preprocessing
+# Check for missing values
+data = data.dropna()
+
+# Separate features and labels (Assuming the target column is named 'label')
+X = data.drop(columns=['label'])
+y = data['label']
+
+# Encode categorical variables if necessary
+X = pd.get_dummies(X, drop_first=True)
+
+# 3. Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# 4. Train a Random Forest Classifier
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# 5. Evaluate the Model
+y_pred = model.predict(X_test)
+
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+print("\nAccuracy:", accuracy_score(y_test, y_pred))
+
+# 6. Save the model (optional)
+import joblib
+joblib.dump(model, 'intrusion_detection_model.pkl')
